@@ -1,0 +1,59 @@
+jobs:
+- name: deploy-concourse
+  serial: true
+  plan:
+  - aggregate:
+    - get: concourse-release
+      trigger: false
+      params:
+        globs:
+        - concourse-*.tgz
+        - garden-linux-*.tgz
+    - get: concourse-config
+      trigger: true
+    - get: stemcell
+      trigger: false
+    - get: pipeline
+      resource: git-deployments-pipeline
+  - put: concourse-deployment
+    params:
+      manifest: pipeline/environment/beta.yml
+      releases:
+        - concourse-release/concourse-*.tgz
+        - concourse-release/garden-linux-*.tgz
+      stemcells:
+        - stemcell/*.tgz
+
+resources:
+- name: concourse-config
+  type: git
+  source:
+    private_key: {{pipeline-private-key}}
+    uri: {{pipeline-git-repo}}
+
+- name: concourse-release
+  type: github-release
+  source:
+    repository: concourse
+    user: concourse
+
+- name: concourse-deployment
+  type: bosh-deployment
+  source:
+    target: {{bosh-target}}
+    username: {{bosh-username}}
+    password: {{bosh-password}}
+    deployment: {{bosh-beta-deployment}}
+    ignore_ssl: true
+
+- name: stemcell
+  type: bosh-io-stemcell
+  source:
+    name: {{bosh-vsphere-stemcell-name}}
+
+- name: git-deployments-pipeline
+  type: git
+  source:
+    uri: {{pipeline-git-repo}}
+    branch: {{pipeline-branch}}
+    private_key: {{pipeline-private-key}}

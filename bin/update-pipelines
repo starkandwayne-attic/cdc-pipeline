@@ -1,0 +1,18 @@
+#!/bin/bash
+
+## Deploys Concourse
+
+TARGET=${target:-"concourse"}
+PIPELINE_NAME=${pipeline:-"concourse"}
+PIPELINE=${PIPELINE:-"pipeline/beta-pipeline.yml"}
+CREDENTIALS=${CREDENTIALS:-"pipeline/credentials.yml"}
+
+if ! [ -x "$(command -v fly)" ]; then
+  echo 'fly is not installed.' >&2
+fi
+
+set -eu
+
+fly -k -t ${TARGET} c -c ${PIPELINE} --vars-from ${CREDENTIALS} ${PIPELINE_NAME}
+
+exit 0

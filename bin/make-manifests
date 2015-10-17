@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if ! [ -x "$(command -v spruce)" ]; then
+  echo -e 'spruce is not installed.\nPlease download at https://github.com/geofffranks/spruce/releases' >&2
+  exit 1
+fi
+
+set -eu
+
+## Make the alpha.yml manifest for the alpha Concourse
+spruce merge --prune meta environment/vsphere/alpha-concourse.yml > environment/vsphere/alpha.yml
+
+## Make the beta.yml manifest for the beta Concourse
+## Note: order matters with spruce.
+spruce merge --prune meta environment/vsphere/alpha-concourse.yml environment/vsphere/beta-concourse.yml > environment/vsphere/beta.yml
+
+exit 0

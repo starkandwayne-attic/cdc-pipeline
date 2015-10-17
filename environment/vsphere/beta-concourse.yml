@@ -1,0 +1,22 @@
+---
+name: beta-concourse
+
+networks:
+  - name: concourse
+    type: manual
+    subnets:
+      - (( replace ))
+      - range: 11.11.11.0/20
+        gateway: 11.11.11.1
+        dns:
+        - 12.12.12.1
+        - 12.12.12.2
+        reserved:
+        - 11.11.11.2 - 11.11.11.69
+        - 11.11.11.80 - 11.11.11.254
+        static:
+        - 11.11.11.70 - 11.11.11.74
+        cloud_properties:
+          name: CLOUDPROPERTIESNAME
+        ## For reference, this leaves the following range for ephemeral IPs:
+        ## - 11.11.11.75 - 11.11.11.79
